@@ -13,4 +13,8 @@ HashMap *initHM();
 
 void appendHM(HashMap *, char[], char[]);
 
+void resizeHM(HashMap *);
+
+void rehashHM(HashMap *, char **, char **);
+
 void printHM(HashMap *);
