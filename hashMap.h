@@ -21,6 +21,6 @@ HashField *populateHF(char[], char[]);
 
 void resizeHM(HashMap *);
 
-void rehashHM(HashMap *, char **, char **);
+void rehashHM(HashMap *, HashField *[], unsigned long);
 
 void printHM(HashMap *);

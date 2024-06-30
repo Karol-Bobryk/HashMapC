@@ -32,13 +32,15 @@ HashMap *initHM() {
 void appendHM(HashMap *hashMap, char key[], char value[]) {
 
   // TODO: add lower boundary
-  if (hashMap->loadFactor > MAX_LOAD_FACTOR)
+  if (hashMap->loadFactor >= MAX_LOAD_FACTOR) {
+
+    printf("doopa\n");
     resizeHM(hashMap);
+  }
 
   HashField *newHF = populateHF(key, value);
 
   unsigned long hashAddress = dbj2Hash(key) % hashMap->fieldsSize;
-  printf("\n%lu\n", hashAddress);
   hashMap->fields[hashAddress] = newHF;
   hashMap->fill++;
   hashMap->loadFactor = hashMap->fill / (float)hashMap->fieldsSize;
@@ -57,9 +59,35 @@ HashField *populateHF(char key[], char value[]) {
   return newHF;
 }
 
-void resizeHM(HashMap *hashMap) {}
-// fix this shit below
-void rehashHM(HashMap *hashMap, char **keys, char **values) {}
+void resizeHM(HashMap *hashMap) {
+
+  unsigned long prevSizeCache = hashMap->fieldsSize;
+
+  hashMap->fieldsSize = hashMap->fieldsSize << 1;
+
+  HashField **fieldsCache = calloc(hashMap->fieldsSize, sizeof(HashField *));
+  memcpy(fieldsCache, hashMap->fields, prevSizeCache * sizeof(HashField *));
+
+  free(hashMap->fields);
+  hashMap->fields = calloc(hashMap->fieldsSize, sizeof(HashField *));
+
+  rehashHM(hashMap, fieldsCache, prevSizeCache);
+
+  hashMap->loadFactor = hashMap->fill / (float)hashMap->fieldsSize;
+
+  free(fieldsCache);
+}
+
+void rehashHM(HashMap *hashMap, HashField *fields[],
+              unsigned long prevSizeCache) {
+  for (int i = 0; i < prevSizeCache; i++) {
+    if (fields[i] != NULL) {
+      unsigned long hashAddress =
+          dbj2Hash(fields[i]->key) % hashMap->fieldsSize;
+      hashMap->fields[hashAddress] = fields[i];
+    }
+  }
+}
 // check print function for errors
 void printHM(HashMap *hashMap) {
   printf("\n");
@@ -67,8 +95,8 @@ void printHM(HashMap *hashMap) {
   printf("fieldsSize: %d\t", hashMap->fieldsSize);
   printf("loadFactor: %f\t", hashMap->loadFactor);
   printf("\n{\n");
-  for (int i = 0; i < hashMap->fill; i++) {
-    if (hashMap->fields[i] != 0)
+  for (int i = 0; i < hashMap->fieldsSize; i++) {
+    if (hashMap->fields[i] != NULL)
       printf("\t%s:%s\n", hashMap->fields[i]->key, hashMap->fields[i]->value);
   }
   printf("}\n");
