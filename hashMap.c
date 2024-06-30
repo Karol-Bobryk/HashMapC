@@ -88,7 +88,7 @@ void rehashHM(HashMap *hashMap, HashField *fields[],
     }
   }
 }
-// check print function for errors
+
 void printHM(HashMap *hashMap) {
   printf("\n");
   printf("fill: %d/%d\t", hashMap->fill, hashMap->fieldsSize);
