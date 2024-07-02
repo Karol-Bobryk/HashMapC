@@ -15,12 +15,14 @@ unsigned long dbj2Hash(char *);
 
 HashMap *initHM();
 
-void appendHM(HashMap *, char[], char[]);
+int appendHM(HashMap *, char[], char[]);
 
 HashField *populateHF(char[], char[]);
 
-void resizeHM(HashMap *);
+int linearProbing(HashMap *, unsigned long);
 
-void rehashHM(HashMap *, HashField *[], unsigned long);
+int resizeHM(HashMap *);
 
-void printHM(HashMap *);
+int rehashHM(HashMap *, HashField *[], unsigned long);
+
+int printHM(HashMap *);
