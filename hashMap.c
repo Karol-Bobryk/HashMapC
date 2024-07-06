@@ -96,6 +96,7 @@ int linearProbing(HashMap *hashMap, unsigned long hashAddress) {
     return -1;
   if (hashAddress < 0)
     return -1;
+
   unsigned int i = hashAddress + 1;
   unsigned int probingAddress = i % hashMap->fieldsSize;
 
@@ -163,6 +164,30 @@ int rehashHM(HashMap *hashMap, HashField *fields[],
   return 0;
 }
 
+char *readHM(HashMap *hashMap, char key[]) {
+  if (hashMap == NULL)
+    return NULL;
+  if (key == NULL)
+    return NULL;
+
+  unsigned long hashAddress = dbj2Hash(key) % hashMap->fieldsSize;
+
+  if (strcmp(hashMap->fields[hashAddress]->key, key) == 0)
+    return hashMap->fields[hashAddress]->value;
+
+  unsigned int i = hashAddress + 1;
+  unsigned int probingAddress = i % hashMap->fieldsSize;
+
+  while (probingAddress != hashAddress) {
+    if (strcmp(hashMap->fields[probingAddress]->key, key) == 0)
+      return hashMap->fields[probingAddress]->value;
+    i++;
+    probingAddress = i % hashMap->fieldsSize;
+  }
+
+  return NULL;
+}
+
 int printHM(HashMap *hashMap) {
   if (hashMap == NULL)
     return -1;
@@ -171,11 +196,13 @@ int printHM(HashMap *hashMap) {
   printf("fieldsSize: %d\t", hashMap->fieldsSize);
   printf("loadFactor: %f\t", hashMap->loadFactor);
   printf("\n{\n");
+
   for (int i = 0; i < hashMap->fieldsSize; i++) {
     if (hashMap->fields[i] != NULL)
       printf("\t%d %s:%s\n", i, hashMap->fields[i]->key,
              hashMap->fields[i]->value);
   }
+
   printf("}\n");
 
   return 0;
