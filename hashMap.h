@@ -11,22 +11,22 @@ typedef struct {
   unsigned int fill;
 } HashMap;
 
-unsigned long dbj2Hash(char *);
+unsigned long HashDbj2(char *);
 
-HashMap *initHM();
+HashMap *HMInit();
 
-int appendHM(HashMap *, char[], char[]);
+int HMAppend(HashMap *, char[], char[]);
 
-HashField *populateHF(char[], char[]);
+HashField *HFPopulate(char[], char[]);
 
 int linearProbing(HashMap *, unsigned long, char[]);
 
-int resizeHM(HashMap *);
+int HMResize(HashMap *);
 
-int rehashHM(HashMap *, HashField *[], unsigned long);
+int HMRehash(HashMap *, HashField *[], unsigned long);
 
-char *readHM(HashMap *, char[]);
+char *HMRead(HashMap *, char[]);
 
-int freeHM(HashMap *);
+int HMFree(HashMap *);
 
-int printHM(HashMap *);
+int HMPrint(HashMap *);

@@ -6,7 +6,7 @@
 #define INIT_HASHMAP_SIZE 4
 #define MAX_LOAD_FACTOR 0.7f
 
-unsigned long dbj2Hash(char *str) {
+unsigned long HashDbj2(char *str) {
   unsigned long hash = 5381;
   int c;
 
@@ -16,7 +16,7 @@ unsigned long dbj2Hash(char *str) {
   return hash;
 }
 
-HashMap *initHM() {
+HashMap *HMInit() {
   HashMap *hashMap = (HashMap *)malloc(sizeof(HashMap));
   if (hashMap == NULL) {
     free(hashMap);
@@ -37,7 +37,7 @@ HashMap *initHM() {
   return hashMap;
 }
 
-int appendHM(HashMap *hashMap, char key[], char value[]) {
+int HMAppend(HashMap *hashMap, char key[], char value[]) {
   if (hashMap == NULL)
     return -1;
   if (key == NULL)
@@ -47,13 +47,13 @@ int appendHM(HashMap *hashMap, char key[], char value[]) {
 
   // TODO: add lower boundary
   if (hashMap->loadFactor >= MAX_LOAD_FACTOR) {
-    if (resizeHM(hashMap) < 0)
+    if (HMResize(hashMap) < 0)
       return -1;
   }
 
-  HashField *newHF = populateHF(key, value);
+  HashField *newHF = HFPopulate(key, value);
 
-  unsigned long hashAddress = dbj2Hash(key) % hashMap->fieldsSize;
+  unsigned long hashAddress = HashDbj2(key) % hashMap->fieldsSize;
   if (hashMap->fields[hashAddress] != NULL) {
     if (strcmp(hashMap->fields[hashAddress]->key, key) == 0) {
       free(hashMap->fields[hashAddress]->value);
@@ -66,10 +66,9 @@ int appendHM(HashMap *hashMap, char key[], char value[]) {
   hashMap->fill++;
   hashMap->loadFactor = hashMap->fill / (float)hashMap->fieldsSize;
   return 0;
-  // TODO: handle collisions
 }
 
-HashField *populateHF(char key[], char value[]) {
+HashField *HFPopulate(char key[], char value[]) {
   if (key == NULL)
     return NULL;
   if (value == NULL)
@@ -113,7 +112,7 @@ int linearProbing(HashMap *hashMap, unsigned long hashAddress, char key[]) {
   return -1;
 };
 
-int resizeHM(HashMap *hashMap) {
+int HMResize(HashMap *hashMap) {
 
   if (hashMap == NULL)
     return -1;
@@ -135,7 +134,7 @@ int resizeHM(HashMap *hashMap) {
     return -1;
   }
 
-  if (rehashHM(hashMap, fieldsCache, prevSizeCache) < 0)
+  if (HMRehash(hashMap, fieldsCache, prevSizeCache) < 0)
     return -1;
 
   hashMap->loadFactor = hashMap->fill / (float)hashMap->fieldsSize;
@@ -144,7 +143,7 @@ int resizeHM(HashMap *hashMap) {
   return 0;
 }
 
-int rehashHM(HashMap *hashMap, HashField *fields[],
+int HMRehash(HashMap *hashMap, HashField *fields[],
              unsigned long prevSizeCache) {
   if (hashMap == NULL)
     return -1;
@@ -156,7 +155,7 @@ int rehashHM(HashMap *hashMap, HashField *fields[],
   for (int i = 0; i < prevSizeCache; i++) {
     if (fields[i] != NULL) {
       unsigned long hashAddress =
-          dbj2Hash(fields[i]->key) % hashMap->fieldsSize;
+          HashDbj2(fields[i]->key) % hashMap->fieldsSize;
 
       if (hashMap->fields[hashAddress] != NULL)
         if ((hashAddress =
@@ -168,13 +167,13 @@ int rehashHM(HashMap *hashMap, HashField *fields[],
   return 0;
 }
 
-char *readHM(HashMap *hashMap, char key[]) {
+char *HMRead(HashMap *hashMap, char key[]) {
   if (hashMap == NULL)
     return NULL;
   if (key == NULL)
     return NULL;
 
-  unsigned long hashAddress = dbj2Hash(key) % hashMap->fieldsSize;
+  unsigned long hashAddress = HashDbj2(key) % hashMap->fieldsSize;
 
   if (strcmp(hashMap->fields[hashAddress]->key, key) == 0)
     return hashMap->fields[hashAddress]->value;
@@ -192,7 +191,7 @@ char *readHM(HashMap *hashMap, char key[]) {
   return NULL;
 }
 
-int freeHM(HashMap *hashMap) {
+int HMFree(HashMap *hashMap) {
   if (hashMap == NULL)
     return -1;
   for (int i = 0; i < hashMap->fieldsSize; i++) {
@@ -207,7 +206,7 @@ int freeHM(HashMap *hashMap) {
   return 0;
 }
 
-int printHM(HashMap *hashMap) {
+int HMPrint(HashMap *hashMap) {
   if (hashMap == NULL)
     return -1;
 
