@@ -11,6 +11,7 @@ int main() {
   appendHM(hm, "key3", "value3");
   appendHM(hm, "key4", "value4");
   printf("\n%s\n", readHM(hm, "key4"));
+  printHM(hm);
   freeHM(hm);
   return 0;
 }

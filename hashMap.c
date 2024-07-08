@@ -202,20 +202,6 @@ int freeHM(HashMap *hashMap) {
   free(hashMap);
   return 0;
 }
-/*
- * {
- *  fieldssize - non allocd
- *  loadFactor - non allocd
- *  fields - allocd <- needs to be freed
- *  fill - non allocd
- * }
- *
- * {
- *  key - alloced <- needs to be freed
- *  value - alloced <- needs to be free
- * }
- *
- * */
 
 int printHM(HashMap *hashMap) {
   if (hashMap == NULL)
