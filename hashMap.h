@@ -27,4 +27,6 @@ int rehashHM(HashMap *, HashField *[], unsigned long);
 
 char *readHM(HashMap *, char[]);
 
+int freeHM(HashMap *);
+
 int printHM(HashMap *);

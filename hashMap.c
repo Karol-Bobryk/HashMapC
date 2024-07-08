@@ -188,9 +188,39 @@ char *readHM(HashMap *hashMap, char key[]) {
   return NULL;
 }
 
+int freeHM(HashMap *hashMap) {
+  if (hashMap == NULL)
+    return -1;
+  for (int i = 0; i < hashMap->fieldsSize; i++) {
+    if (hashMap->fields[i] != NULL) {
+      free(hashMap->fields[i]->key);
+      free(hashMap->fields[i]->value);
+      free(hashMap->fields[i]);
+    }
+  }
+  free(hashMap->fields);
+  free(hashMap);
+  return 0;
+}
+/*
+ * {
+ *  fieldssize - non allocd
+ *  loadFactor - non allocd
+ *  fields - allocd <- needs to be freed
+ *  fill - non allocd
+ * }
+ *
+ * {
+ *  key - alloced <- needs to be freed
+ *  value - alloced <- needs to be free
+ * }
+ *
+ * */
+
 int printHM(HashMap *hashMap) {
   if (hashMap == NULL)
     return -1;
+
   printf("\n");
   printf("fill: %d/%d\t", hashMap->fill, hashMap->fieldsSize);
   printf("fieldsSize: %d\t", hashMap->fieldsSize);
