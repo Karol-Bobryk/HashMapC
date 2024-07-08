@@ -19,7 +19,7 @@ int appendHM(HashMap *, char[], char[]);
 
 HashField *populateHF(char[], char[]);
 
-int linearProbing(HashMap *, unsigned long);
+int linearProbing(HashMap *, unsigned long, char[]);
 
 int resizeHM(HashMap *);
 

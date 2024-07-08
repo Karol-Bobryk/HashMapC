@@ -54,15 +54,17 @@ int appendHM(HashMap *hashMap, char key[], char value[]) {
   HashField *newHF = populateHF(key, value);
 
   unsigned long hashAddress = dbj2Hash(key) % hashMap->fieldsSize;
-  if (hashMap->fields[hashAddress] == NULL)
-    hashMap->fields[hashAddress] = newHF;
-  else if ((hashAddress = linearProbing(hashMap, hashAddress)) < 0)
-    return -1;
-
+  if (hashMap->fields[hashAddress] != NULL) {
+    if (strcmp(hashMap->fields[hashAddress]->key, key) == 0) {
+      free(hashMap->fields[hashAddress]->value);
+      free(hashMap->fields[hashAddress]->key);
+      free(hashMap->fields[hashAddress]);
+    } else if ((hashAddress = linearProbing(hashMap, hashAddress, key)) < 0)
+      return -1;
+  }
   hashMap->fields[hashAddress] = newHF;
   hashMap->fill++;
   hashMap->loadFactor = hashMap->fill / (float)hashMap->fieldsSize;
-
   return 0;
   // TODO: handle collisions
 }
@@ -80,7 +82,7 @@ HashField *populateHF(char key[], char value[]) {
   }
   newHF->key = calloc(strlen(key) + 1, sizeof(key[0]));
   newHF->value = calloc(strlen(value) + 1, sizeof(value[0]));
-  if (key == NULL || value == NULL) {
+  if (newHF->key == NULL || newHF->value == NULL) {
     free(newHF->key);
     free(newHF->value);
     return NULL;
@@ -91,7 +93,7 @@ HashField *populateHF(char key[], char value[]) {
   return newHF;
 }
 
-int linearProbing(HashMap *hashMap, unsigned long hashAddress) {
+int linearProbing(HashMap *hashMap, unsigned long hashAddress, char key[]) {
   if (hashMap == NULL)
     return -1;
   if (hashAddress < 0)
@@ -101,7 +103,8 @@ int linearProbing(HashMap *hashMap, unsigned long hashAddress) {
   unsigned int probingAddress = i % hashMap->fieldsSize;
 
   while (probingAddress != hashAddress) {
-    if (hashMap->fields[probingAddress] == NULL)
+    if (hashMap->fields[probingAddress] == NULL ||
+        strcmp(hashMap->fields[probingAddress]->key, key) == 0)
       return probingAddress;
     i++;
     probingAddress = i % hashMap->fieldsSize;
@@ -156,7 +159,8 @@ int rehashHM(HashMap *hashMap, HashField *fields[],
           dbj2Hash(fields[i]->key) % hashMap->fieldsSize;
 
       if (hashMap->fields[hashAddress] != NULL)
-        if ((hashAddress = linearProbing(hashMap, hashAddress)) < 0)
+        if ((hashAddress =
+                 linearProbing(hashMap, hashAddress, fields[i]->key)) < 0)
           return -1;
       hashMap->fields[hashAddress] = fields[i];
     }
